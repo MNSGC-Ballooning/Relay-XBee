@@ -10,6 +10,8 @@ class XBee {
 	public:
 		XBee(HardwareSerial* port, String id);
 		XBee(SoftwareSerial* port, String id);
+		begin(long baud);
+		setCooldown(byte cooldown);
 		void send(String message);
 		String receive();
 	private:
@@ -18,6 +20,7 @@ class XBee {
 		bool usingSoftSerial;
 		String id;
 		String lastCom;
+		byte cooldown;
 		unsigned long comTime;
 		void acknowledge();
 		bool isAvailable();

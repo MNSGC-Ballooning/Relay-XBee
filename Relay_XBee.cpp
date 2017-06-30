@@ -12,6 +12,15 @@ XBee::XBee(SoftwareSerial* port, String id) {
 	this->id = id;
 }
 
+XBee::begin(long baud) {
+	if (usingSoftSerial) softPort->begin(baud);
+	else hardPort->begin(baud);
+}
+
+XBee::setCooldown(byte cooldown) {
+	this->cooldown = cooldown;
+}
+
 void XBee::send(String message) {
 	println(id + ";" + message + "!");
 }
@@ -28,7 +37,7 @@ String XBee::receive() {
 			break;
 		}
 	}
-	if (!complete || command.equals(lastCommand) && (millis() - comTime < 30000)) return "";
+	if (!complete || command.equals(lastCommand) && (millis() - comTime < cooldown * 1000)) return "";
 	byte split = command.indexOf('?');
 	if (!(command.substring(0, split)).equals(id)) return "";
 	lastCommand = command;
