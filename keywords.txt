@@ -1,0 +1,3 @@
+XBee	KEYWORD1
+send	KEYWORD2
+receive	KEYWORD2
