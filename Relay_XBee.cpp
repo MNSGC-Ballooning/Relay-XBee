@@ -21,7 +21,7 @@ XBee::begin(long baud) {
 }
 
 //sets cooldown between repeat commands
-XBee::setCooldown(byte cooldown) {
+void XBee::setCooldown(byte cooldown) {
 	this->cooldown = cooldown;
 }
 
@@ -45,11 +45,11 @@ String XBee::receive() {
 		}
 	}
 	//return an empty string if command is a repeat, since the Relay transmits a command repeatedly until acknowledged
-	if (!complete || command.equals(lastCommand) && (millis() - comTime < cooldown * 1000)) return "";
+	if (!complete || command.equals(lastCom) && (millis() - comTime < cooldown * 1000)) return "";
 	byte split = command.indexOf('?');	//question mark separates id from command
 	if (!(command.substring(0, split)).equals(id)) return "";	//returns empty string if wrong id
-	lastCommand = command;		//once a valid command is received, save it to avoid repeats...
-	commandTime = millis();		//...for a short time
+	lastCom = command;		//once a valid command is received, save it to avoid repeats...
+	comTime = millis();		//...for a short time
 	acknowledge();				//inform relay that command was received
 	return (command.substring(split + 1, command.length() -1));	//return just the command portion as a string
 }
