@@ -15,7 +15,7 @@ XBee::XBee(SoftwareSerial* port, String id) {
 }
 
 //call during setup to begin appropriate serial connection
-XBee::begin(long baud) {
+void XBee::begin(long baud) {
 	if (usingSoftSerial) softPort->begin(baud);
 	else hardPort->begin(baud);
 }
