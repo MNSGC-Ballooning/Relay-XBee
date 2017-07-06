@@ -10,7 +10,7 @@ class XBee {
 	public:
 		XBee(HardwareSerial* port, String id);
 		XBee(SoftwareSerial* port, String id);
-		begin(long baud);
+		void begin(long baud);
 		void setCooldown(byte cooldown);
 		void send(String message);
 		String receive();
