@@ -20,7 +20,7 @@ class XBee {
 		bool usingSoftSerial;
 		String id;
 		String lastCom;
-		byte cooldown;
+		byte cooldown = 10; //default time before accepting repeat transmissions is 10s
 		unsigned long comTime;
 		void acknowledge();
 		bool isAvailable();
