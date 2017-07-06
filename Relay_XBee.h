@@ -1,5 +1,5 @@
 #ifndef Relay_XBee_h
-#def Relay_XBee_h
+#define Relay_XBee_h
 
 #include <Arduino.h>
 #include <SoftwareSerial.h>
@@ -11,7 +11,7 @@ class XBee {
 		XBee(HardwareSerial* port, String id);
 		XBee(SoftwareSerial* port, String id);
 		begin(long baud);
-		setCooldown(byte cooldown);
+		void setCooldown(byte cooldown);
 		void send(String message);
 		String receive();
 	private:
