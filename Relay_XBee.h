@@ -25,7 +25,7 @@ class XBee {
 		void acknowledge();
 		bool isAvailable();
 		void println(String data);
-		String read();
+		char read();
 }
 
 #endif
