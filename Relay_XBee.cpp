@@ -60,7 +60,7 @@ void XBee::acknowledge() {
 }
 
 //checks appropriate serial connection for available data
-bool XBee::isAvailable)() {
+bool XBee::isAvailable() {
 	if (usingSoftSerial) return softPort->available() > 0;
 	else return hardPort->available() > 0;
 }
