@@ -8,16 +8,22 @@ XBee::XBee(HardwareSerial* port, String id) {
 }
 
 //constructor for software serial connection
+#ifdef SoftwareSerial_h
 XBee::XBee(SoftwareSerial* port, String id) {
 	softPort = port;
 	usingSoftSerial = true;
 	this->id = id;
 }
+#endif
 
 //call during setup to begin appropriate serial connection
 void XBee::begin(long baud) {
-	if (usingSoftSerial) softPort->begin(baud);
-	else hardPort->begin(baud);
+#ifdef SoftwareSerial_h
+	if (usingSoftSerial)
+		softPort->begin(baud);
+	else
+#endif
+		hardPort->begin(baud);
 }
 
 //sets cooldown between repeat commands
@@ -61,18 +67,30 @@ void XBee::acknowledge() {
 
 //checks appropriate serial connection for available data
 bool XBee::isAvailable() {
-	if (usingSoftSerial) return softPort->available() > 0;
-	else return hardPort->available() > 0;
+#ifdef SoftwareSerial_h
+	if (usingSoftSerial)
+		return softPort->available() > 0;
+	else
+#endif
+		return hardPort->available() > 0;
 }
 
 //calls println() function of appropriate serial connection
 void XBee::println(String data) {
-	if (usingSoftSerial) softPort->println(data);
-	else hardPort->println(data);
+#ifdef SoftwareSerial_h
+	if (usingSoftSerial)
+		softPort->println(data);
+	else
+#endif
+		hardPort->println(data);
 }
 
 //calls read() function of appropriate serial connection
 char XBee::read() {
-	if (usingSoftSerial) return char(softPort->read());
-	else return char(hardPort->read());
+#ifdef SoftwareSerial_h
+	if (usingSoftSerial)
+		return char(softPort->read());
+	else
+#endif
+		return char(hardPort->read());
 }

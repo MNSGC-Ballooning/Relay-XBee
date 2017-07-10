@@ -2,21 +2,24 @@
 #define Relay_XBee_h
 
 #include <Arduino.h>
-#include <SoftwareSerial.h>
 
 
 
 class XBee {
 	public:
 		XBee(HardwareSerial* port, String id);
+#ifdef SoftwareSerial_h
 		XBee(SoftwareSerial* port, String id);
+#endif
 		void begin(long baud);
 		void setCooldown(byte cooldown);
 		void send(String message);
 		String receive();
 	private:
 		HardwareSerial* hardPort;
+#ifdef SoftwareSerial_h
 		SoftwareSerial* softPort;
+#endif
 		bool usingSoftSerial;
 		String id;
 		String lastCom;
