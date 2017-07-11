@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-
+#include <SoftwareSerial.h> //Comment this out if inclusion causes errors, or using hard serial and want to save space
 
 class XBee {
 	public:
