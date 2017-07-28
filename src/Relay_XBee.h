@@ -2,6 +2,7 @@
 #define Relay_XBee_h
 
 #include <Arduino.h>
+
 //Comment this out if inclusion causes errors, or using hard serial and want to save memory
 #include <SoftwareSerial.h>
 
