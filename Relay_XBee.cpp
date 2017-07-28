@@ -31,9 +31,44 @@ void XBee::setCooldown(byte cooldown) {
 	this->cooldown = cooldown;
 }
 
-//sends input string to Relay, with id and correct formatting
+//sends input String to Relay, with id and correct formatting
 void XBee::send(String message) {
-	println(id + ";" + message + "!");
+	int transmissionLength = id.length() + message.length() + 2;
+	char* transmission = new char[transmissionLength];
+	int pos = 2;
+	for (byte i = 0; i < id.length(); i++) {
+		transmission[pos] = id.charAt(i);
+		pos++;
+	}
+	transmission[pos] = ';';
+	pos++;
+	for (byte i = 0; i < message.length(); i++) {
+		transmission[pos] = message.charAt(i);
+		pos++;
+	}
+	transmission[pos] = '!';
+	println(transmission, transmissionLength);
+	delete[] transmission;
+}
+
+//sends input char array to Relay, with id and correct formatting. Use this version for longer transmisssions to save memory
+void XBee::send(char* message, int messageLength) {
+	int transmissionLength = id.length() + messageLength + 2;
+	char* transmission = new char[transmissionLength];
+	int pos = 2;
+	for (byte i = 0; i < id.length(); i++) {
+		transmission[pos] = id.charAt(i);
+		pos++;
+	}
+	transmission[pos] = ';';
+	pos++;
+	for (byte i = 0; i < messageLength; i++) {
+		transmission[pos] = message[i];
+		pos++;
+	}
+	transmission[pos] = '!';
+	println(transmission, transmissionLength);
+	delete[] transmission;
 }
 
 //parses incoming xBee transmissions for valid commands with xBee's id
@@ -56,13 +91,20 @@ String XBee::receive() {
 	if (!(command.substring(0, split)).equals(id)) return "";	//returns empty string if wrong id
 	lastCom = command;		//once a valid command is received, save it to avoid repeats...
 	comTime = millis();		//...for a short time
-	acknowledge();				//inform relay that command was received
+	acknowledge();			//inform relay that command was received
 	return (command.substring(split + 1, command.length() -1));	//return just the command portion as a string
 }
 
 //used to tell the Relay that the transmission was received
 void XBee::acknowledge() {
-	println(id + "\n");
+	byte len = id.length() + 1;
+	char* ack = new char[len];
+	for (byte i = 0; i < len - 1; i++) {
+		ack[i] = id.charAt(i);
+	}
+	ack[len-1] = '\n';
+	println(ack, len);
+	delete[] ack;
 }
 
 //checks appropriate serial connection for available data
@@ -76,13 +118,16 @@ bool XBee::isAvailable() {
 }
 
 //calls println() function of appropriate serial connection
-void XBee::println(String data) {
+void XBee::println(char* data, int dataLength) {
 #ifdef SoftwareSerial_h
-	if (usingSoftSerial)
-		softPort->println(data);
+	if (usingSoftSerial){
+		softPort->write(data, dataLength);
+		softPort->println();
+	}
 	else
 #endif
-		hardPort->println(data);
+		hardPort->write(data, dataLength);
+		hardPort->println();
 }
 
 //calls read() function of appropriate serial connection

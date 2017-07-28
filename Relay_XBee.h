@@ -2,8 +2,8 @@
 #define Relay_XBee_h
 
 #include <Arduino.h>
-
-#include <SoftwareSerial.h> //Comment this out if inclusion causes errors, or using hard serial and want to save space
+//Comment this out if inclusion causes errors, or using hard serial and want to save memory
+#include <SoftwareSerial.h>
 
 class XBee {
 	public:
@@ -14,6 +14,7 @@ class XBee {
 		void begin(long baud);
 		void setCooldown(byte cooldown);
 		void send(String message);
+		void send(char* message, int messageLength);
 		String receive();
 	private:
 		HardwareSerial* hardPort;
@@ -27,7 +28,7 @@ class XBee {
 		unsigned long comTime;
 		void acknowledge();
 		bool isAvailable();
-		void println(String data);
+		void println(char* data, int dataLength);
 		char read();
 };
 
