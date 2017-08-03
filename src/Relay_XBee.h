@@ -29,7 +29,7 @@ class XBee {
 		unsigned long comTime;
 		void acknowledge();
 		bool isAvailable();
-		void println(char* data, int dataLength);
+		void println(char* data, unsigned int dataLength);
 		char read();
 };
 

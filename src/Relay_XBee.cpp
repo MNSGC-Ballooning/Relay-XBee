@@ -33,9 +33,9 @@ void XBee::setCooldown(byte cooldown) {
 
 //sends input String to Relay, with id and correct formatting
 void XBee::send(String message) {
-	int transmissionLength = id.length() + message.length() + 2;
+	unsigned int transmissionLength = id.length() + message.length() + 2;
 	char* transmission = new char[transmissionLength];
-	int pos = 2;
+	int pos = 0;
 	for (byte i = 0; i < id.length(); i++) {
 		transmission[pos] = id.charAt(i);
 		pos++;
@@ -53,9 +53,9 @@ void XBee::send(String message) {
 
 //sends input char array to Relay, with id and correct formatting. Use this version for longer transmisssions to save memory
 void XBee::send(char* message, int messageLength) {
-	int transmissionLength = id.length() + messageLength + 2;
+	unsigned int transmissionLength = id.length() + messageLength + 2;
 	char* transmission = new char[transmissionLength];
-	int pos = 2;
+	int pos = 0;
 	for (byte i = 0; i < id.length(); i++) {
 		transmission[pos] = id.charAt(i);
 		pos++;
@@ -118,7 +118,7 @@ bool XBee::isAvailable() {
 }
 
 //calls println() function of appropriate serial connection
-void XBee::println(char* data, int dataLength) {
+void XBee::println(char* data, unsigned int dataLength) {
 #ifdef SoftwareSerial_h
 	if (usingSoftSerial){
 		softPort->write(data, dataLength);
