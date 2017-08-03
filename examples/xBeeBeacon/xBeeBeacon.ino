@@ -26,7 +26,28 @@ void setup() {
 void loop() {
   //execute loop only once per second
   if (millis() - timer > 1000) {
+	//read temp sensor
     float temp = (analogRead(tempPin)*(5.0/1024)-.5)/.01;
+	//send data to ground
     xBee.send("Temp: " + String(temp));
+	
+	//For large data transmissions, a char array can be used instead to save memory:
+	/*
+	String prefix = "Temp: ";
+	String tempStr = String(temp);
+	byte len = 5 + tempStr.length();
+	char* data = new char[len];
+	byte pos = 0;
+	for (byte i = 0; i < prefix.length(); i++) {
+      data[pos] = prefix.charAt(i);
+	  pos++;
+	}
+	for (byte i = 0; i < tempStr.length(); i++) {
+	  data[pos] = tempStr.charAt(i);
+	  pos++;
+	}
+	xBee.send(data, len);
+	delete[] data;
+	*/
   }
 }
