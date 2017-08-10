@@ -2,4 +2,5 @@ XBee	KEYWORD1
 begin	KEYWORD2
 setCooldown	KEYWORD2
 send	KEYWORD2
+sendGPS	KEYWORD2
 receive	KEYWORD2

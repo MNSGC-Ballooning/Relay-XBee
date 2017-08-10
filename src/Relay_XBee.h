@@ -16,6 +16,7 @@ class XBee {
 		void setCooldown(byte cooldown);
 		void send(String message);
 		void send(char* message, int messageLength);
+		void sendGPS(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats);
 		String receive();
 	private:
 		HardwareSerial* hardPort;
