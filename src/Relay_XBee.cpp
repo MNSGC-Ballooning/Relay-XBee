@@ -69,7 +69,7 @@ void XBee::send(char* message, int messageLength) {
 
 //sends gps data by xBee in a format the ground station can parse
 void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats) {
-	char* data = new char[40];
+	char* data = new char[42];
 	int pos = 0;
 	//Add each parameter to the char array in order
 	{	//hour
@@ -81,6 +81,8 @@ void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, fl
 			data[pos] = h.charAt(i);
 		}
 	}
+	data[pos] = ':';
+	pos++;
 	{	//minute
 		String m = String(minute);
 		for (byte i = m.length(); i < 2; i++, pos++) {
@@ -90,6 +92,8 @@ void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, fl
 			data[pos] = m.charAt(i);
 		}
 	}
+	data[pos] = ':';
+	pos++;
 	{	//second
 		String s = String(second);
 		for (byte i = s.length(); i < 2; i++, pos++) {
@@ -99,24 +103,32 @@ void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, fl
 			data[pos] = s.charAt(i);
 		}
 	}
+	data[pos] = ',';
+	pos++;
 	{	//lat
 		String l = String(lat, 4);
 		for (byte i = 0; i < l.length(); i++, pos++) {
 			data[pos] = l.charAt(i);
 		}
 	}
+	data[pos] = ',';
+	pos++;
 	{	//lon
 		String l = String(lon, 4);
 		for (byte i = 0; i < l.length(); i++, pos++) {
 			data[pos] = l.charAt(i);
 		}
 	}
+	data[pos] = ',';
+	pos++;
 	{	//alt
 		String a = String(alt, 1);
 		for (byte i = 0; i < a.length(); i++, pos++) {
 			data[pos] = a.charAt(i);
 		}
 	}
+	data[pos] = ',';
+	pos++;
 	{	//sats
 		String s = String(sats);
 		for (byte i = 0; i < s.length(); i++, pos++) {
