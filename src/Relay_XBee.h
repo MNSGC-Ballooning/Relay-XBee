@@ -31,7 +31,7 @@ class XBee {
 		void acknowledge();
 		bool isAvailable();
 		void println(char* data, unsigned int dataLength);
-		char read();
+		String read();
 };
 
 #endif

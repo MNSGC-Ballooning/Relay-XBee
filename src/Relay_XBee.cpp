@@ -20,10 +20,16 @@ XBee::XBee(SoftwareSerial* port, String id) {
 void XBee::begin(long baud) {
 #ifdef SoftwareSerial_h
 	if (usingSoftSerial)
+	{
 		softPort->begin(baud);
+		softPort->setTimeout(10);
+	}
 	else
 #endif
+	{
 		hardPort->begin(baud);
+		hardPort->setTimeout(10);
+	}
 }
 
 //sets cooldown between repeat commands
@@ -36,14 +42,12 @@ void XBee::send(String message) {
 	unsigned int transmissionLength = id.length() + message.length() + 2;
 	char* transmission = new char[transmissionLength];
 	int pos = 0;
-	for (byte i = 0; i < id.length(); i++, pos++) {
-		transmission[pos] = id.charAt(i);
-	}
+	id.toCharArray(transmission, id.length() + 1);
+	pos += id.length();
 	transmission[pos] = ';';
 	pos++;
-	for (byte i = 0; i < message.length(); i++, pos++) {
-		transmission[pos] = message.charAt(i);
-	}
+	message.toCharArray(transmission + pos, message.length() + 1);
+	pos += message.length();
 	transmission[pos] = '!';
 	println(transmission, transmissionLength);
 	delete[] transmission;
@@ -54,9 +58,8 @@ void XBee::send(char* message, int messageLength) {
 	unsigned int transmissionLength = id.length() + messageLength + 2;
 	char* transmission = new char[transmissionLength];
 	int pos = 0;
-	for (byte i = 0; i < id.length(); i++, pos++) {
-		transmission[pos] = id.charAt(i);
-	}
+	id.toCharArray(transmission, id.length() + 1);
+	pos += id.length();
 	transmission[pos] = ';';
 	pos++;
 	for (byte i = 0; i < messageLength; i++, pos++) {
@@ -71,75 +74,73 @@ void XBee::send(char* message, int messageLength) {
 void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats) {
 	char* transmission = new char[42 + id.length() + 2];
 	int pos = 0;
-	for (byte i = 0; i < id.length(); i++, pos++) {
-		transmission[pos] = id.charAt(i);
-	}
+	id.toCharArray(transmission, id.length() + 1);
+	pos += id.length();
 	transmission[pos] = ';';
 	pos++;
 	//Add each parameter to the char array in order
-	{	//hour
-		String h = String(hour);
-		for (byte i = h.length(); i < 2; i++, pos++) {
-			transmission[pos] = '0';
-		}
-		for (byte i = 0; i < h.length(); i++, pos++) {
-			transmission[pos] = h.charAt(i);
-		}
+	//hour
+	String str = String(hour);
+	for (byte i = str.length(); i < 2; i++, pos++) {
+		transmission[pos] = '0';
 	}
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = ':';
 	pos++;
-	{	//minute
-		String m = String(minute);
-		for (byte i = m.length(); i < 2; i++, pos++) {
-			transmission[pos] = '0';
-		}
-		for (byte i = 0; i < m.length(); i++, pos++) {
-			transmission[pos] = m.charAt(i);
-		}
+	
+	//minute
+	str = String(minute);
+	for (byte i = str.length(); i < 2; i++, pos++) {
+		transmission[pos] = '0';
 	}
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = ':';
 	pos++;
-	{	//second
-		String s = String(second);
-		for (byte i = s.length(); i < 2; i++, pos++) {
-			transmission[pos] = '0';
-		}
-		for (byte i = 0; i < s.length(); i++, pos++) {
-			transmission[pos] = s.charAt(i);
-		}
+	
+	//second
+	str = String(second);
+	for (byte i = str.length(); i < 2; i++, pos++) {
+		transmission[pos] = '0';
 	}
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = ',';
 	pos++;
-	{	//lat
-		String l = String(lat, 4);
-		for (byte i = 0; i < l.length(); i++, pos++) {
-			transmission[pos] = l.charAt(i);
-		}
-	}
+	
+	//lat
+	str = String(lat, 4);
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = ',';
 	pos++;
-	{	//lon
-		String l = String(lon, 4);
-		for (byte i = 0; i < l.length(); i++, pos++) {
-			transmission[pos] = l.charAt(i);
-		}
-	}
+	
+	//lon
+	str = String(lon, 4);
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = ',';
 	pos++;
-	{	//alt
-		String a = String(alt, 1);
-		for (byte i = 0; i < a.length(); i++, pos++) {
-			transmission[pos] = a.charAt(i);
-		}
-	}
+	
+	//alt
+	str = String(alt, 1);
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = ',';
 	pos++;
-	{	//sats
-		String s = String(sats);
-		for (byte i = 0; i < s.length(); i++, pos++) {
-			transmission[pos] = s.charAt(i);
-		}
-	}
+	
+	//sats
+	str = String(sats);
+	str.toCharArray(transmission + pos, str.length() + 1);
+	pos += str.length();
+	
 	transmission[pos] = '!';
 	pos++;
 	println(transmission, pos);
@@ -149,25 +150,15 @@ void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, fl
 //parses incoming xBee transmissions for valid commands with xBee's id
 //and returns just the command as a string if found
 String XBee::receive() {
-	bool complete = false;
-	String command = "";
-	char inChar;
-	while (isAvailable()) {
-		inChar = read();
-		if (inChar != ' ') command += inChar;	//parse out extra spaces
-		if (inChar == '!') {					//exclamation point is terminating character
-			complete = true;
-			break;
-		}
-	}
+	String command = read();
 	//return an empty string if command is a repeat, since the Relay transmits a command repeatedly until acknowledged
-	if (!complete || command.equals(lastCom) && (millis() - comTime < cooldown * 1000)) return "";
+	if (command.equals(lastCom) && (millis() - comTime < cooldown * 1000)) return "";
 	byte split = command.indexOf('?');	//question mark separates id from command
 	if (!(command.substring(0, split)).equals(id)) return "";	//returns empty string if wrong id
 	lastCom = command;		//once a valid command is received, save it to avoid repeats...
 	comTime = millis();		//...for a short time
 	acknowledge();			//inform relay that command was received
-	return (command.substring(split + 1, command.length() -1));	//return just the command portion as a string
+	return (command.substring(split + 1, command.length()));	//return just the command portion as a string
 }
 
 //used to tell the Relay that the transmission was received
@@ -206,11 +197,11 @@ void XBee::println(char* data, unsigned int dataLength) {
 }
 
 //calls read() function of appropriate serial connection
-char XBee::read() {
+String XBee::read() {
 #ifdef SoftwareSerial_h
 	if (usingSoftSerial)
-		return char(softPort->read());
+		return softPort->readStringUntil('!');
 	else
 #endif
-		return char(hardPort->read());
+		return hardPort->readStringUntil('!');
 }
