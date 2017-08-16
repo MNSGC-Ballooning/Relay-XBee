@@ -69,74 +69,81 @@ void XBee::send(char* message, int messageLength) {
 
 //sends gps data by xBee in a format the ground station can parse
 void XBee::sendGPS(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats) {
-	char* data = new char[42];
+	char* transmission = new char[42 + id.length() + 2];
 	int pos = 0;
+	for (byte i = 0; i < id.length(); i++, pos++) {
+		transmission[pos] = id.charAt(i);
+	}
+	transmission[pos] = ';';
+	pos++;
 	//Add each parameter to the char array in order
 	{	//hour
 		String h = String(hour);
 		for (byte i = h.length(); i < 2; i++, pos++) {
-			data[pos] = '0';
+			transmission[pos] = '0';
 		}
 		for (byte i = 0; i < h.length(); i++, pos++) {
-			data[pos] = h.charAt(i);
+			transmission[pos] = h.charAt(i);
 		}
 	}
-	data[pos] = ':';
+	transmission[pos] = ':';
 	pos++;
 	{	//minute
 		String m = String(minute);
 		for (byte i = m.length(); i < 2; i++, pos++) {
-			data[pos] = '0';
+			transmission[pos] = '0';
 		}
 		for (byte i = 0; i < m.length(); i++, pos++) {
-			data[pos] = m.charAt(i);
+			transmission[pos] = m.charAt(i);
 		}
 	}
-	data[pos] = ':';
+	transmission[pos] = ':';
 	pos++;
 	{	//second
 		String s = String(second);
 		for (byte i = s.length(); i < 2; i++, pos++) {
-			data[pos] = '0';
+			transmission[pos] = '0';
 		}
 		for (byte i = 0; i < s.length(); i++, pos++) {
-			data[pos] = s.charAt(i);
+			transmission[pos] = s.charAt(i);
 		}
 	}
-	data[pos] = ',';
+	transmission[pos] = ',';
 	pos++;
 	{	//lat
 		String l = String(lat, 4);
 		for (byte i = 0; i < l.length(); i++, pos++) {
-			data[pos] = l.charAt(i);
+			transmission[pos] = l.charAt(i);
 		}
 	}
-	data[pos] = ',';
+	transmission[pos] = ',';
 	pos++;
 	{	//lon
 		String l = String(lon, 4);
 		for (byte i = 0; i < l.length(); i++, pos++) {
-			data[pos] = l.charAt(i);
+			transmission[pos] = l.charAt(i);
 		}
 	}
-	data[pos] = ',';
+	transmission[pos] = ',';
 	pos++;
 	{	//alt
 		String a = String(alt, 1);
 		for (byte i = 0; i < a.length(); i++, pos++) {
-			data[pos] = a.charAt(i);
+			transmission[pos] = a.charAt(i);
 		}
 	}
-	data[pos] = ',';
+	transmission[pos] = ',';
 	pos++;
 	{	//sats
 		String s = String(sats);
 		for (byte i = 0; i < s.length(); i++, pos++) {
-			data[pos] = s.charAt(i);
+			transmission[pos] = s.charAt(i);
 		}
 	}
-	send(data, pos);
-	delete[] data;
+	transmission[pos] = '!';
+	pos++;
+	println(transmission, pos);
+	delete[] transmission;
 }
 
 //parses incoming xBee transmissions for valid commands with xBee's id
