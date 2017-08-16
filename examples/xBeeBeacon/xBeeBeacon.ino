@@ -26,6 +26,7 @@ void setup() {
 void loop() {
   //execute loop only once per second
   if (millis() - timer > 1000) {
+    timer = millis();
 	//read temp sensor
     float temp = (analogRead(tempPin)*(5.0/1024)-.5)/.01;
 	//send data to ground
