@@ -1,18 +1,16 @@
 #include "Relay_XBee.h"
 
 //constructor for hardware serial connection
-XBee::XBee(HardwareSerial* port, String id) {
-	hardPort = port;
+XBee::XBee(HardwareSerial* port, String id):
+	hardPort(port), id(id) {
 	usingSoftSerial = false;
-	this->id = id;
 }
 
 //constructor for software serial connection
 #ifdef SoftwareSerial_h
-XBee::XBee(SoftwareSerial* port, String id) {
-	softPort = port;
+XBee::XBee(SoftwareSerial* port, String id):
+	softPort(port), id(id) {
 	usingSoftSerial = true;
-	this->id = id;
 }
 #endif
 
