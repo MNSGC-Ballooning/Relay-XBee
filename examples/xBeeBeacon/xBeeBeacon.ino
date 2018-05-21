@@ -20,7 +20,7 @@ unsigned long timer = 0;
 
 void setup() {
   //Begin XBee communication at specified baud rate. Should be 9600 unless previously set otherwise.
-  xBee.begin(9600);
+  xBee.initialize();
 }
 
 void loop() {

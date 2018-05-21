@@ -21,7 +21,7 @@ XBee xBee = XBee(&xBeeSerial, "GPS");
 void setup() {
   //begin both serial connections
   gpsSerial.begin(9600);
-  xBee.begin(9600);
+  xBee.initialize();
 }
 
 void loop() {
