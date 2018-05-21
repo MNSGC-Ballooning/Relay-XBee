@@ -1,8 +1,9 @@
 XBee	KEYWORD1
-initialize   KEYWORD2
+initialize	KEYWORD2
 setCooldown	KEYWORD2
 send	KEYWORD2
 sendGPS	KEYWORD2
 receive	KEYWORD2
-enterATmode KEYWORD2
-atCommand   KEYWORD2
+enterATmode	KEYWORD2
+exitATmode	KEYWORD2
+atCommand	KEYWORD2

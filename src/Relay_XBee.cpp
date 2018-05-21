@@ -62,28 +62,11 @@ void XBee::initialize() {
     hardPort->begin(9600);
     hardPort->setTimeout(10);
   }
-  if (PANid.equals("")) return;
-  String response;
-    for (byte i = 0; !enterATmode() && (i < 10); i++) {}
-    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
-      response = atCommand("ATID"+PANid);
-    }
-    response = "";
-    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
-      response = atCommand("ATDL0");
-    }
-    response = "";
-    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
-      response = atCommand("ATMY1");
-    }
-    response = "";
-    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
-      response = atCommand("ATWR");
-    }
-    response = "";
-    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
-      response = atCommand("ATCN");
-    }
+  enterATmode();
+  atCommand("ATID"+PANid);
+  atCommand("ATDL0");
+  atCommand("ATMY1");
+  exitATmode();
 }
 
 //sets cooldown between repeat commands
@@ -219,22 +202,33 @@ String XBee::receive() {
 //Returns true if successful
 bool XBee::enterATmode() {
   String response;
-  #ifdef SoftwareSerial_h
-  if (usingSoftSerial) {
-    softPort->print("+++");
-    delay(3000);
-    response = softPort->readStringUntil('\r');
-  }
-  else
+  for (byte i = 0; response.equals("") && (i < 10); i++) {
+#ifdef SoftwareSerial_h
+    if (usingSoftSerial) {
+      softPort->print("+++");
+      delay(1000);
+      response = softPort->readStringUntil('\r');
+    }
+    else
 #endif
-  {
-    hardPort->print("+++");
-    delay(3000);
-    response = hardPort->readStringUntil('\r');
+    {
+      hardPort->print("+++");
+      delay(1000);
+      response = hardPort->readStringUntil('\r');
+    }
   }
   return response.equals("OK");
 }
 
+//Call this function after sending AT commands
+//Writes configuration to memory and ensures a clean exit
+bool XBee::exitATmode() {
+  String success = atCommand("ATWR");
+  atCommand("ATCN");
+  return success.equals("OK");
+}
+
+//Sends the given AT command to the XBee, and returns the response
 String XBee::atCommand(String command) {
 #ifdef SoftwareSerial_h
   if (usingSoftSerial) {
@@ -290,8 +284,8 @@ void XBee::println(char* data, unsigned int dataLength) {
 String XBee::read() {
 #ifdef SoftwareSerial_h
   if (usingSoftSerial)
-    return softPort->readStringUntil('\n');
+    return softPort->readStringUntil('!');
   else
 #endif
-    return hardPort->readStringUntil('\n');
+    return hardPort->readStringUntil('!');
 }

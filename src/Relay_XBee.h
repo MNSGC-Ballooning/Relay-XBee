@@ -21,6 +21,7 @@ class XBee {
     void sendGPS(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats);
     String receive();
     bool enterATmode();
+    bool exitATmode();
     String atCommand(String command);
   private:
     HardwareSerial* hardPort;
