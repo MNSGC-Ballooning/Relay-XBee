@@ -9,23 +9,27 @@
 class XBee {
   public:
     XBee(HardwareSerial* port, String id);
+    XBee(HardwareSerial* port, String id, char stack);
 #ifdef SoftwareSerial_h
     XBee(SoftwareSerial* port, String id);
+    XBee(SoftwareSerial* port, String id, char stack);
 #endif
-    void begin(long baud);
+    void initialize();
     void setCooldown(byte cooldown);
     void send(String message);
     void send(char* message, int messageLength);
     void sendGPS(byte hour, byte minute, byte second, float lat, float lon, float alt, byte sats);
     String receive();
+    bool enterATmode();
+    String atCommand(String command);
   private:
     HardwareSerial* hardPort;
 #ifdef SoftwareSerial_h
     SoftwareSerial* softPort;
 #endif
     bool usingSoftSerial;
-    String id;
-    String lastCom;
+    String id, lastCom;
+    String PANid = "";
     byte cooldown = 10; //default time before accepting repeat transmissions is 10s
     unsigned long comTime;
     void acknowledge();

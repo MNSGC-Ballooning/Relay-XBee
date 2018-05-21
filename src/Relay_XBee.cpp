@@ -1,33 +1,89 @@
 #include "Relay_XBee.h"
 
-//constructor for hardware serial connection
+//Constructor for hardware serial connection. Does not alter XBee settings
 XBee::XBee(HardwareSerial* port, String id):
   hardPort(port), id(id) {
   usingSoftSerial = false;
 }
 
-//constructor for software serial connection
+//Constructor for hardware serial connection. Configures XBee to communicate with given stack.
+XBee::XBee(HardwareSerial* port, String id, char stack):
+  hardPort(port), id(id) {
+    usingSoftSerial = false;
+    switch (stack) {
+      case 'A':
+        PANid = "AAAA";
+        break;
+      case 'B':
+        PANid = "BBBB";
+        break;
+      case 'C':
+        PANid = 'CCCC';
+        break;
+    }
+}
+
 #ifdef SoftwareSerial_h
+//Constructor for software serial connection. Does not alter XBee settings
 XBee::XBee(SoftwareSerial* port, String id):
   softPort(port), id(id) {
   usingSoftSerial = true;
 }
+
+//Constructor for software serial connection. Configures XBee to communicate with given stack.
+XBee::XBee(SoftwareSerial* port, String id, char stack):
+  softPort(port), id(id) {
+    usingSoftSerial = true;
+    switch (stack) {
+      case 'A':
+        PANid = "AAAA";
+        break;
+      case 'B':
+        PANid = "BBBB";
+        break;
+      case 'C':
+        PANid = 'CCCC';
+        break;
+    }
+}
 #endif
 
 //call during setup to begin appropriate serial connection
-void XBee::begin(long baud) {
+void XBee::initialize() {
 #ifdef SoftwareSerial_h
   if (usingSoftSerial)
   {
-    softPort->begin(baud);
+    softPort->begin(9600);
     softPort->setTimeout(10);
   }
   else
 #endif
   {
-    hardPort->begin(baud);
+    hardPort->begin(9600);
     hardPort->setTimeout(10);
   }
+  if (PANid.equals("")) return;
+  String response;
+    for (byte i = 0; !enterATmode() && (i < 10); i++) {}
+    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
+      response = atCommand("ATID"+PANid);
+    }
+    response = "";
+    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
+      response = atCommand("ATDL0");
+    }
+    response = "";
+    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
+      response = atCommand("ATMY1");
+    }
+    response = "";
+    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
+      response = atCommand("ATWR");
+    }
+    response = "";
+    for (byte i = 0; !response.equals("OK") && (i < 10); i++) {
+      response = atCommand("ATCN");
+    }
 }
 
 //sets cooldown between repeat commands
@@ -159,6 +215,40 @@ String XBee::receive() {
   return (command.substring(split + 1, command.length()));	//return just the command portion as a string
 }
 
+//Call this function before attempting to send AT commands.
+//Returns true if successful
+bool XBee::enterATmode() {
+  String response;
+  #ifdef SoftwareSerial_h
+  if (usingSoftSerial) {
+    softPort->print("+++");
+    delay(3000);
+    response = softPort->readStringUntil('\r');
+  }
+  else
+#endif
+  {
+    hardPort->print("+++");
+    delay(3000);
+    response = hardPort->readStringUntil('\r');
+  }
+  return response.equals("OK");
+}
+
+String XBee::atCommand(String command) {
+#ifdef SoftwareSerial_h
+  if (usingSoftSerial) {
+    softPort->print(command + '\r');
+    return softPort->readStringUntil('\r');
+  }
+  else
+#endif
+  {
+    hardPort->print(command);
+    return hardPort->readStringUntil('\r');
+  }
+}
+
 //used to tell the Relay that the transmission was received
 void XBee::acknowledge() {
   byte len = id.length() + 1;
@@ -190,16 +280,18 @@ void XBee::println(char* data, unsigned int dataLength) {
   }
   else
 #endif
+  {
     hardPort->write(data, dataLength);
     hardPort->println();
+  }
 }
 
 //calls read() function of appropriate serial connection
 String XBee::read() {
 #ifdef SoftwareSerial_h
   if (usingSoftSerial)
-    return softPort->readStringUntil('!');
+    return softPort->readStringUntil('\n');
   else
 #endif
-    return hardPort->readStringUntil('!');
+    return hardPort->readStringUntil('\n');
 }
