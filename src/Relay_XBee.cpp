@@ -18,7 +18,7 @@ XBee::XBee(HardwareSerial* port, String id, char stack):
         PANid = "BBBB";
         break;
       case 'C':
-        PANid = 'CCCC';
+        PANid = "CCCC";
         break;
     }
 }
@@ -42,7 +42,7 @@ XBee::XBee(SoftwareSerial* port, String id, char stack):
         PANid = "BBBB";
         break;
       case 'C':
-        PANid = 'CCCC';
+        PANid = "CCCC";
         break;
     }
 }
